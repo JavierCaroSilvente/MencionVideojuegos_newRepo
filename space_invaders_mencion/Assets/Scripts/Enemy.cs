@@ -10,7 +10,8 @@ public class Enemy : MonoBehaviour
     {
         INIT,
         RIGHT,
-        LEFT
+        LEFT,
+        GAMEOVER
     }
 
     public State state;
@@ -35,6 +36,9 @@ public class Enemy : MonoBehaviour
             case State.LEFT:
                 transform.Translate(Vector3.left * Time.deltaTime * speedEnemy);
                 OnChangeState(State.LEFT);
+                break;
+            case State.GAMEOVER:
+               
                 break;
         }
 
@@ -65,6 +69,11 @@ public class Enemy : MonoBehaviour
         {
             Destroy(other.gameObject);
             Destroy(this.gameObject);
+        }
+
+        if (other.tag == "Player")
+        {
+            state = State.GAMEOVER;
         }
     }
 }
