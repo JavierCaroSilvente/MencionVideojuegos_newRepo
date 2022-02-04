@@ -54,7 +54,17 @@ public class Enemy : MonoBehaviour
         if(currentState != state)
         {
             speedEnemy += 0.5f;
+            transform.position = new Vector2(transform.position.x, transform.position.y - 0.5f);
             currentState = state;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.tag == "Torpedo")
+        {
+            Destroy(other.gameObject);
+            Destroy(this.gameObject);
         }
     }
 }
