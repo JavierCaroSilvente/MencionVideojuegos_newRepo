@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     public float speedEnemy;
     private State currentState = State.INIT;
+    private bool inGameOver = false;
     public enum State
     {
         INIT,
@@ -18,6 +19,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        GameManager.totalEnemies += 1;
         state = State.RIGHT;
     }
 
@@ -38,7 +40,7 @@ public class Enemy : MonoBehaviour
                 OnChangeState(State.LEFT);
                 break;
             case State.GAMEOVER:
-               
+                OnGameOverState(true);
                 break;
         }
 
@@ -63,10 +65,21 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void OnGameOverState(bool state)
+    {
+        if (inGameOver != state)
+        {
+           
+
+            inGameOver = state;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if(other.tag == "Torpedo")
         {
+            GameManager.totalEnemies -= 1;
             Destroy(other.gameObject);
             Destroy(this.gameObject);
         }

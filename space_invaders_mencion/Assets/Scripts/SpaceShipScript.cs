@@ -15,16 +15,16 @@ public class SpaceShipScript : MonoBehaviour
     public int totalBulletsInScene = 0;
 
     public static bool enemyTouchPlayer = false;
-
     private bool inGameOver = false;
 
     public enum State
     {
         INGAME,
-        GAMEOVER
+        GAMEOVER,
+        WIN
     }
 
-    public State state;
+    public static State state;
 
     // Start is called before the first frame update
     void Start()
@@ -46,9 +46,18 @@ public class SpaceShipScript : MonoBehaviour
                 float xPos = Mathf.Clamp(transform.position.x, -6f, 6f);
 
                 transform.position = new Vector2(xPos, transform.position.y);
+
+                if(GameManager.state == GameManager.State.WIN)
+                {
+                    state = State.WIN;
+                }
+
                 break;
             case State.GAMEOVER:
 
+                rigid.constraints = RigidbodyConstraints2D.FreezeAll;
+                break;
+            case State.WIN:
                 rigid.constraints = RigidbodyConstraints2D.FreezeAll;
                 break;
         }
@@ -75,20 +84,16 @@ public class SpaceShipScript : MonoBehaviour
                 OnGameOverState(true);
                 break;
         }
-
-       
     }
 
     IEnumerator destroyBullet(GameObject bullet)
     {
         yield return new WaitForSeconds(3.5f);
         Destroy(bullet);
-        //totalBulletsInScene = 0;
     }
 
     private void OnGameOverState(bool state)
     {
-       
         if (inGameOver != state)
         {
             inGameOver = state;
@@ -100,6 +105,7 @@ public class SpaceShipScript : MonoBehaviour
         if(other.tag == "Enemy"){
             enemyTouchPlayer = true;
             state = State.GAMEOVER;
+            GameManager.state = GameManager.State.GAMEOVER;
         }
     }
 }
