@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speedEnemy;
     private State currentState = State.INIT;
     private bool inGameOver = false;
+    private Rigidbody2D rb;
     public enum State
     {
         INIT,
@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        rb = this.gameObject.GetComponent<Rigidbody2D>();
         GameManager.totalEnemies += 1;
         state = State.RIGHT;
     }
@@ -26,17 +27,16 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         switch (state)
         {
             case State.INIT:
                 
                 break;
             case State.RIGHT:
-                transform.Translate(Vector3.right * Time.deltaTime * speedEnemy);
                 OnChangeState(State.RIGHT);
                 break;
             case State.LEFT:
-                transform.Translate(Vector3.left * Time.deltaTime * speedEnemy);
                 OnChangeState(State.LEFT);
                 break;
             case State.GAMEOVER:
@@ -46,12 +46,12 @@ public class Enemy : MonoBehaviour
 
         if (transform.position.x <= -6.7f)
         {
-            state = State.LEFT;
+            state = State.RIGHT;
         }
 
         if (transform.position.x >= 6.7f)
         {
-            state = State.RIGHT;
+            state = State.LEFT;
         }
     }
 
@@ -59,8 +59,6 @@ public class Enemy : MonoBehaviour
     {
         if(currentState != state)
         {
-            speedEnemy += 0.5f;
-            transform.position = new Vector2(transform.position.x, transform.position.y - 0.5f);
             currentState = state;
         }
     }
@@ -69,7 +67,8 @@ public class Enemy : MonoBehaviour
     {
         if (inGameOver != state)
         {
-           
+            EnemyBlock.state = EnemyBlock.State.GAMEOVER;
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
 
             inGameOver = state;
         }
@@ -79,7 +78,7 @@ public class Enemy : MonoBehaviour
     {
         if(other.tag == "Torpedo")
         {
-            GameManager.totalEnemies -= 1;
+           
             Destroy(other.gameObject);
             Destroy(this.gameObject);
         }
@@ -88,5 +87,21 @@ public class Enemy : MonoBehaviour
         {
             state = State.GAMEOVER;
         }
+
+        if(other.tag == "ParedIzquierda")
+        {
+            EnemyBlock.state = EnemyBlock.State.LEFT;
+        }
+
+        if (other.tag == "ParedDerecha")
+        {
+            EnemyBlock.state = EnemyBlock.State.RIGHT;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        EnemyBlock.instance.CheckChilds();
+        GameManager.totalEnemies -= 1;
     }
 }
